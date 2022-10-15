@@ -2,16 +2,20 @@ let bpm = 90;
 let intervalIds = [];
 const hits = [];
 const audio = new Audio('tick.mp3');
-let numMeasures = 1;
+let numMeasures = 2;
 let measureSubdivision = 16;
+function totalSubdivisions() {
+    return numMeasures * measureSubdivision;
+}
 let counter = 0;
 setupRhythm();
 
 function setupRhythm() {
     const rhythmDiv = document.getElementById('rhythm');
     for (let measure = 0; measure < numMeasures; measure++) {
+        const div = document.createElement('div');
         for (let subdivision = 0; subdivision < measureSubdivision; subdivision++) {
-            const index = subdivision * measure + subdivision;
+            const index = measureSubdivision * measure + subdivision;
             const span = document.createElement('span');
             const check = document.createElement('input');
             check.setAttribute('type', 'checkbox');
@@ -27,8 +31,9 @@ function setupRhythm() {
             }
     
             span.appendChild(check);
-            rhythmDiv.appendChild(span);
+            div.appendChild(span);
         }
+        rhythmDiv.appendChild(div);
     }
     
 }
@@ -52,12 +57,16 @@ function stop() {
     counter = 0;
     intervalIds.forEach(id => clearInterval(id));
     intervalIds = [];
+    for (let index = 0; index < totalSubdivisions(); index++) {
+        const span = document.getElementById('rhythm'+index);
+        span.setAttribute('class', '');
+    }
     //clear on beat color
 }
 
 function playSound() {
     let numSubdivisions = measureSubdivision * numMeasures;
-    let prevCounter = (counter + numSubdivisions - 1) % numSubdivisions;
+    let prevCounter = (counter + totalSubdivisions() - 1) % totalSubdivisions();
     let prevSpan = document.getElementById('rhythm' + prevCounter);
     prevSpan?.setAttribute('class', '');
     let span = document.getElementById('rhythm' + counter);
@@ -68,7 +77,7 @@ function playSound() {
         audio.play();
     }
     counter++;
-    counter = counter % 16;
+    counter = counter % totalSubdivisions();
 }
 
 function setBpm(newBpm) {
