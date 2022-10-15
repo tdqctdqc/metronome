@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <input type="number" value="90" min="20" max="300"
+    <label for="bpm">BPM: </label>
+    <input id="bpm" type="number" value="90" min="20" max="300"
         onchange="setBpm(this.value)">
     <button onclick="start()">Start</button>
     <button onclick="stop()">Stop</button>

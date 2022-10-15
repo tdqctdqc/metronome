@@ -1,8 +1,10 @@
 let bpm = 90;
 let intervalIds = [];
 const hits = [];
-const audio = new Audio('tick.mp3');
+const tick = new Audio('tick.mp3');
+const currentSubdivClass = 'currentSubdiv';
 let numMeasures = 2;
+let beatSubdivs = [0, 4, 8, 12];
 let measureSubdivision = 16;
 function totalSubdivisions() {
     return numMeasures * measureSubdivision;
@@ -20,10 +22,10 @@ function setupRhythm() {
             const check = document.createElement('input');
             check.setAttribute('type', 'checkbox');
             span.setAttribute('id', 'rhythm' + index);
-            check.setAttribute('onchange', `toggledRhythm(this.checked, ${index})`);
-            
-            if((index) % 4 === 0) {
+            check.addEventListener('change', e => toggledSubdivisionActive(e.target.checked, index));
+            if(beatSubdivs.includes(subdivision)) {
                 check.setAttribute('checked', true);
+                span.classList.add('beat');
                 hits[index] = true;
             }
             else {
@@ -38,7 +40,7 @@ function setupRhythm() {
     
 }
 
-function toggledRhythm(pressed, index) {
+function toggledSubdivisionActive(pressed, index) {
     hits[index] = pressed;
 }
 
@@ -58,23 +60,22 @@ function stop() {
     intervalIds.forEach(id => clearInterval(id));
     intervalIds = [];
     for (let index = 0; index < totalSubdivisions(); index++) {
-        const span = document.getElementById('rhythm'+index);
-        span.setAttribute('class', '');
+        const span = getSubdivisionSpan(index);
+        span.classList.remove(currentSubdivClass);
     }
-    //clear on beat color
 }
 
 function playSound() {
     let numSubdivisions = measureSubdivision * numMeasures;
     let prevCounter = (counter + totalSubdivisions() - 1) % totalSubdivisions();
-    let prevSpan = document.getElementById('rhythm' + prevCounter);
-    prevSpan?.setAttribute('class', '');
-    let span = document.getElementById('rhythm' + counter);
-    span.setAttribute('class', 'onBeat');
+    let prevSpan = getSubdivisionSpan(prevCounter);
+    prevSpan.classList.remove(currentSubdivClass);
+    let span = getSubdivisionSpan(counter);
+    span.classList.add(currentSubdivClass);
     if(hits[counter] === true) {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.play();
+        tick.pause();
+        tick.currentTime = 0;
+        tick.play();
     }
     counter++;
     counter = counter % totalSubdivisions();
@@ -85,4 +86,8 @@ function setBpm(newBpm) {
     if(intervalIds.length > 0) {
         start();
     }
+}
+
+function getSubdivisionSpan(index) {
+    return document.getElementById('rhythm' + index);
 }

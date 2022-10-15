@@ -1,4 +1,7 @@
-.onBeat {
+.beat {
+    background-color: red;
+}
+
+.currentSubdiv {
     background-color: black;
-    color: black;
 }
